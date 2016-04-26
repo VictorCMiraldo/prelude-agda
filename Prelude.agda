@@ -42,6 +42,10 @@ module Prelude where
               inject+ to finject; raise to fraise)
     public
 
+  finject1 : {n : ℕ} → Fin n → Fin (suc n)
+  finject1 fz     = fz
+  finject1 (fs i) = fs (finject1 i)
+
   open import Data.Fin.Properties
     using ()
     renaming (_≟_ to _≟-Fin_)
