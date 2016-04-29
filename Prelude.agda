@@ -135,6 +135,11 @@ module Prelude where
   lhead []      = nothing
   lhead (x ∷ _) = just x
 
+  filter-just : {A : Set} → List (Maybe A) → List A
+  filter-just [] = []
+  filter-just (nothing ∷ as) = filter-just as
+  filter-just (just a  ∷ as) = a ∷ filter-just as
+
   map-lemma : {A B : Set}{f : A → B}{g : B → A}
             → (l : List A)
             → (∀ x → g (f x) ≡ x)

@@ -176,3 +176,9 @@ module Prelude.Vector where
   map-toList-lemma [] f = refl
   map-toList-lemma (x ∷ as) f 
     = cong (_∷_ (f x)) (map-toList-lemma as f)
+
+  vzip : {k l : ℕ}{A B : Set}
+       → k ≡ l → Vec A k → Vec B l → Vec (A × B) k
+  vzip refl [] [] = []
+  vzip refl (x ∷ v1) (y ∷ v2)
+    = (x , y) ∷ vzip refl v1 v2
