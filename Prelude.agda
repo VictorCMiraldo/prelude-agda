@@ -60,7 +60,8 @@ module Prelude where
   open import Data.Product
     using (∃; Σ; _×_; _,_; uncurry; curry)
     renaming (proj₁ to p1; proj₂ to p2
-           ; <_,_> to split)
+           ; <_,_> to split
+           ; map to _×'_)
     public
 
   open import Data.Sum
