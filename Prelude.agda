@@ -64,6 +64,12 @@ module Prelude where
            ; map to _×'_)
     public
 
+  -- Cartesian product of two lists
+  _**_ : {A B : Set} → List A → List B → List (A × B)
+  [] ** _ = []
+  _ ** [] = []
+  (a ∷ as) ** bs = map (λ y → (a , y)) bs ++ (as ** bs)  
+
   open import Data.Sum
     using (_⊎_; [_,_]′)
     renaming (inj₁ to i1; inj₂ to i2
