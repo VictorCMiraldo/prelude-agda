@@ -1,0 +1,80 @@
+open import Prelude
+
+module Prelude.NatProperties where
+
+  open import Data.Nat.Properties
+    using ( ≤-steps; m≤m+n; n≤m+n; n≤1+n; 1+n≰n
+          ; n≤m+n∸m; n∸n≡0; ∸-+-assoc; +-∸-assoc
+          ; m+n∸n≡m; m+n∸m≡n; i+j≡0⇒i≡0; i+j≡0⇒j≡0
+          ; cancel-+-left-≤; cancel-+-left
+          )
+    public
+  open import Data.Nat.Properties.Simple
+    using (+-comm; +-suc; +-assoc)
+    public
+
+  suc-inj : ∀{m n} → suc m ≡ suc n → m ≡ n
+  suc-inj refl = refl
+
+  ≤-step : {n m : ℕ} → n ≤ m → n ≤ suc m
+  ≤-step hip = ≤-steps 1 hip
+
+  ≤-unstep : {n m : ℕ} → suc n ≤ m → n ≤ m
+  ≤-unstep (s≤s p) = ≤-step p
+
+  ≤-elim : {n m : ℕ} → m ≤ suc n → (m ≡ suc n → ⊥) → m ≤ n
+  ≤-elim {_} {zero} prf n≢m         = z≤n
+  ≤-elim {zero} {suc .0} (s≤s z≤n) n≢m = ⊥-elim (n≢m refl)
+  ≤-elim {suc n} {suc m} (s≤s prf) n≢m 
+    = s≤s (≤-elim prf (n≢m ∘ cong suc))
+
+  ≤-elim' : {n m : ℕ} → n ≤ m → (¬ (n ≡ m)) → suc n ≤ m
+  ≤-elim' {m = zero} z≤n hip = ⊥-elim (hip refl)
+  ≤-elim' {m = suc m} z≤n hip = s≤s z≤n
+  ≤-elim' (s≤s nm) hip = s≤s (≤-elim' nm (hip ∘ cong suc))
+
+  ≤-abs : {n m : ℕ} → suc m ≤ n → m ≡ n → ⊥
+  ≤-abs {m = zero} (s≤s p) ()
+  ≤-abs {m = suc m} (s≤s p) q = ≤-abs p (suc-inj q)
+
+  ≤-strict : {n m : ℕ}{p : ¬ (n ≡ m)} 
+           → suc n ≤ m → (n ≟-ℕ m) ≡ no p
+  ≤-strict {n} {suc m} {p} (s≤s hip) 
+    with n ≟-ℕ (suc m)
+  ...| yes q = ⊥-elim (p q)
+  ...| no ¬q = cong no (¬≡-pi ¬q p)
+
+  +-≤-factor : {m n o : ℕ} → m + n ≡ o → m ≤ o 
+  +-≤-factor {zero} prf = z≤n
+  +-≤-factor {suc m} refl = s≤s (+-≤-factor refl)
+
+  +-≤-split 
+    : {m n o : ℕ} → m + n ≤ o → m ≤ o × n ≤ o
+  +-≤-split {zero} prf = z≤n , prf
+  +-≤-split {suc m} {o = zero} ()
+  +-≤-split {suc m} {o = suc o} (s≤s prf)
+    with +-≤-split {m} {o = o} prf
+  ...| p1 , p2 = s≤s p1 , s≤ p2
+    where
+      s≤ : {n m : ℕ} → n ≤ m → n ≤ suc m
+      s≤ z≤n     = z≤n
+      s≤ (s≤s p) = s≤s (s≤ p)
+
+  ≤-+-distr : {m n o p : ℕ} 
+      → m ≤ o → n ≤ p → m + n ≤ o + p
+  ≤-+-distr {o = zero} z≤n s = s
+  ≤-+-distr {o = suc o} z≤n s = ≤-step (≤-+-distr {o = o} z≤n s)
+  ≤-+-distr (s≤s r) s = s≤s (≤-+-distr r s)
+
+  ≤-pi : {n m : ℕ} → (p q : n ≤ m) → p ≡ q
+  ≤-pi z≤n z≤n = refl
+  ≤-pi (s≤s p) (s≤s q) = cong s≤s (≤-pi p q)
+
+  ≤-total : {m n : ℕ} → (m ≤ n → ⊥) → n ≤ m
+  ≤-total {zero} hip = ⊥-elim (hip z≤n)
+  ≤-total {suc m} {zero} hip = z≤n
+  ≤-total {suc m} {suc n} hip = s≤s (≤-total (hip ∘ s≤s))
+
+  ≤-trans : {m n o : ℕ} → m ≤ n → n ≤ o → m ≤ o
+  ≤-trans z≤n s = z≤n
+  ≤-trans (s≤s r) (s≤s s) = s≤s (≤-trans r s)
