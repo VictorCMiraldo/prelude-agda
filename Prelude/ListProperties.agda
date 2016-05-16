@@ -67,3 +67,12 @@ module Prelude.ListProperties where
              → drop (length l) (l ++ j) ≡ j
   drop-++-id {l = []} = refl
   drop-++-id {l = x ∷ l} {j} = drop-++-id {l = l} {j = j}
+
+  concat-map-map
+    : {A B C : Set}{f : B → C}{g : A → List B}(l : List A)
+    → concat (map (map f ∘ g) l)
+    ≡ map f (concat (map g l))
+  concat-map-map {f = f} {g = g} [] = refl
+  concat-map-map {f = f} {g = g} (x ∷ l)
+    rewrite concat-map-map {f = f} {g} l
+      = sym (map-++-commute f (g x) (concat (map g l)))
