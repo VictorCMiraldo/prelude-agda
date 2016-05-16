@@ -16,6 +16,16 @@ module Prelude.NatProperties where
   suc-inj : ∀{m n} → suc m ≡ suc n → m ≡ n
   suc-inj refl = refl
 
+  +-inj-1 : ∀{m n o} → m + n ≡ m + o → n ≡ o
+  +-inj-1 {zero} p = p
+  +-inj-1 {suc m} p = +-inj-1 {m = m} (suc-inj p)
+
+  +-inj-2 : ∀{m n o} → n + m ≡ o + m → n ≡ o
+  +-inj-2 {m} {n} {o} p 
+    rewrite +-comm n m 
+          | +-comm o m
+          = +-inj-1 {m = m} p
+
   ≤-step : {n m : ℕ} → n ≤ m → n ≤ suc m
   ≤-step hip = ≤-steps 1 hip
 
@@ -78,3 +88,13 @@ module Prelude.NatProperties where
   ≤-trans : {m n o : ℕ} → m ≤ n → n ≤ o → m ≤ o
   ≤-trans z≤n s = z≤n
   ≤-trans (s≤s r) (s≤s s) = s≤s (≤-trans r s)
+
+  1-≤-+-distr : (m n : ℕ) → 1 ≤ m + n → (1 ≤ m) ⊎ (1 ≤ n)
+  1-≤-+-distr zero n hip    = i2 hip
+  1-≤-+-distr (suc m) n hip = i1 (s≤s z≤n)
+
+  m≢n-elim : (m n : ℕ) → (m ≡ n → ⊥) → ∃ (λ k → (m ≡ suc k) ⊎ (n ≡ suc k))
+  m≢n-elim zero zero hip = ⊥-elim (hip refl)
+  m≢n-elim zero (suc n) hip = n , i2 refl
+  m≢n-elim (suc m) zero hip = m , i1 refl
+  m≢n-elim (suc m) (suc n) hip = m , i1 refl

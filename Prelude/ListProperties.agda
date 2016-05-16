@@ -8,6 +8,7 @@ module Prelude.ListProperties where
     using ( length-++; map-compose; map-++-commute
           ; length-map
           )
+    renaming (∷-injective to ∷-inj)
     public
 
   list-split-lemma 
@@ -67,3 +68,10 @@ module Prelude.ListProperties where
              → drop (length l) (l ++ j) ≡ j
   drop-++-id {l = []} = refl
   drop-++-id {l = x ∷ l} {j} = drop-++-id {l = l} {j = j}
+
+  length-concat : {A : Set}(l : List (List A))
+                → length (concat l) ≡ sum (map length l)
+  length-concat []       = refl
+  length-concat (a ∷ as)
+    = trans (length-++ a)
+            (cong (length a +_) (length-concat as))
