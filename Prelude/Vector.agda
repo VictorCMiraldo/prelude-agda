@@ -1,9 +1,8 @@
 open import Prelude
-open import Data.List.Properties
-    using (length-map; length-++)
-    renaming (∷-injective to ∷-inj)
-open import Data.Nat.Properties.Simple
-     using (+-comm)
+open import Prelude.ListProperties
+    using (length-map; length-++; ∷-inj)
+open import Prelude.NatProperties
+     using (+-comm; suc-inj; +-inj-1; +-inj-2)
 
 module Prelude.Vector where
 
@@ -11,19 +10,6 @@ module Prelude.Vector where
     using (Vec; []; _∷_; head; tail) 
     renaming (_++_ to _++v_)
     public
-
-  suc-inj : ∀{m n} → suc m ≡ suc n → m ≡ n
-  suc-inj refl = refl
-
-  +-inj-1 : ∀{m n o} → m + n ≡ m + o → n ≡ o
-  +-inj-1 {zero} p = p
-  +-inj-1 {suc m} p = +-inj-1 {m = m} (suc-inj p)
-
-  +-inj-2 : ∀{m n o} → n + m ≡ o + m → n ≡ o
-  +-inj-2 {m} {n} {o} p 
-    rewrite +-comm n m 
-          | +-comm o m
-          = +-inj-1 {m = m} p
 
   vec : {k : ℕ}{A : Set}(l : List A)
       → length l ≡ k → Vec A k
