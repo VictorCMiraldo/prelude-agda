@@ -106,6 +106,14 @@ module Prelude where
     renaming (maybe′ to maybe)
     public
 
+  record Iso {a b}(A : Set a)(B : Set b) : Set (a ⊔ b) where
+    constructor iso
+    field
+      f     : A → B
+      g     : B → A
+      fg-id : ∀ x → f (g x) ≡ x
+      gf-id : ∀ x → g (f x) ≡ x
+
   {-# BUILTIN REWRITE _≡_ #-}
 
   {- Usefull List Processing -}
