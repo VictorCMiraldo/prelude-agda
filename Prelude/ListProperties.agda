@@ -11,6 +11,17 @@ module Prelude.ListProperties where
     renaming (∷-injective to ∷-inj)
     public
 
+  open import Data.List.All
+    using (All; []; _∷_)
+    public
+
+  open import Data.List.Any
+    using (Any; here; there; module Membership-≡)
+    public
+
+  open Membership-≡
+    public
+
   list-split-lemma 
     : {A : Set}{n : ℕ}{l : List A}
     → n ≤ length l
@@ -91,29 +102,37 @@ module Prelude.ListProperties where
   non-empty [] (_ , ())
   non-empty (x ∷ l) hip = x , l
 
-  open import Data.List.All
-    using (All; []; _∷_)
+  open import Data.List.Any hiding (map)
 
   all-++ : {A : Set}{l2 : List A}
-         → (P : A → Set)
+         → {P : A → Set}
          → (l1 : List A)
          → All P l1 → All P l2
          → All P (l1 ++ l2)
-  all-++ P [] hl1 hl2 = hl2
-  all-++ P (x ∷ xs) (px ∷ hl1) hl2
-    = px ∷ all-++ P xs hl1 hl2
+  all-++ [] hl1 hl2 = hl2
+  all-++ (x ∷ xs) (px ∷ hl1) hl2
+    = px ∷ all-++ xs hl1 hl2
 
   all-map : {A B : Set}{f : A → B}
-          → (P : B → Set)(l : List A)
+          → {P : B → Set}(l : List A)
           → All (P ∘ f) l
           → All P (map f l)
-  all-map P [] hip = []
-  all-map P (x ∷ xs) (px ∷ hip)
-    = px ∷ (all-map P xs hip)
+  all-map [] hip = []
+  all-map (x ∷ xs) (px ∷ hip)
+    = px ∷ (all-map xs hip)
 
-  all-Pi : {A : Set}{P : A → Set}
+  all-pi : {A : Set}{P : A → Set}
          → ((a : A) → P a)
          → (l : List A)
          → All P l
-  all-Pi prf [] = []
-  all-Pi prf (x ∷ l) = (prf x) ∷ (all-Pi prf l)
+  all-pi prf [] = []
+  all-pi prf (x ∷ l) = (prf x) ∷ (all-pi prf l)
+
+  all-⇒ : {A : Set}{P Q : A → Set}
+        → (l : List A)
+        → All P l
+        → (∀ a → P a → Q a)
+        → All Q l
+  all-⇒ [] hip prf = []
+  all-⇒ (x ∷ xs) (px ∷ hip) prf
+    = (prf x px) ∷ (all-⇒ xs hip prf)

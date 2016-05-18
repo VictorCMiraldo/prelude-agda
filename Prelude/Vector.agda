@@ -81,6 +81,13 @@ module Prelude.Vector where
   vmap-lemma [] prf      = refl
   vmap-lemma (x ∷ k) prf = cong₂ _∷_ (prf x) (vmap-lemma k prf)
 
+  vmap-compose
+    : {k : ℕ}{A B C : Set}{f : B → C}{g : A → B}
+    → (v : Vec A k)
+    → vmap f (vmap g v) ≡ vmap (f ∘ g) v
+  vmap-compose [] = refl
+  vmap-compose {f = f} {g} (x ∷ v) = cong (_∷_ (f (g x))) (vmap-compose v)
+
   vsplit : {n : ℕ}{A : Set}(m : ℕ) 
          → Vec A (m + n) → Vec A m × Vec A n
   vsplit zero v          = [] , v
@@ -168,3 +175,16 @@ module Prelude.Vector where
   vzip refl [] [] = []
   vzip refl (x ∷ v1) (y ∷ v2)
     = (x , y) ∷ vzip refl v1 v2
+
+  vzip-elim-p1
+    : {k l : ℕ}{A B : Set}(vA : Vec A k)(vB : Vec B l)
+    → {prf : k ≡ l}
+    → vmap p1 (vzip prf vA vB) ≡ vA
+  vzip-elim-p1 [] [] {refl} = refl
+  vzip-elim-p1 (a ∷ vA) (b ∷ vB) {refl} = cong (_∷_ a) (vzip-elim-p1 vA vB)
+
+  vzip-elim-p2
+    : {k : ℕ}{A B : Set}(vA : Vec A k)(vB : Vec B k)
+    → vmap p2 (vzip refl vA vB) ≡ vB
+  vzip-elim-p2 [] [] = refl
+  vzip-elim-p2 (a ∷ vA) (b ∷ vB) = cong (_∷_ b) (vzip-elim-p2 vA vB)
