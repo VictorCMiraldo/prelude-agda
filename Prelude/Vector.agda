@@ -11,6 +11,10 @@ module Prelude.Vector where
     renaming (_++_ to _++v_)
     public
 
+  vsum : {k : ℕ} → Vec ℕ k → ℕ
+  vsum [] = 0
+  vsum (x ∷ xs) = x + vsum xs
+
   vec : {k : ℕ}{A : Set}(l : List A)
       → length l ≡ k → Vec A k
   vec []       refl = []
