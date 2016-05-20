@@ -35,6 +35,10 @@ module Prelude.Vector where
              → vec l p ≡ vec l q
   vec-reduce l {refl} {refl} = refl
 
+  vec-reindx : {k m : ℕ}{A : Set}(p : k ≡ m)
+             → Vec A k → Vec A m
+  vec-reindx refl v = v
+
   vec-toList : {k : ℕ}{A : Set}(v : Vec A k)
              → vec (toList v) (length-toList v) ≡ v
   vec-toList [] = refl
@@ -192,3 +196,8 @@ module Prelude.Vector where
     → vmap p2 (vzip refl vA vB) ≡ vB
   vzip-elim-p2 [] [] = refl
   vzip-elim-p2 (a ∷ vA) (b ∷ vB) = cong (_∷_ b) (vzip-elim-p2 vA vB)
+
+  vsum-spec : {k : ℕ}(v : Vec ℕ k)
+            → vsum v ≡ sum (toList v)
+  vsum-spec [] = refl
+  vsum-spec (x ∷ v) = cong (_+_ x) (vsum-spec v)
