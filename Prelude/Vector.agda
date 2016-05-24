@@ -39,6 +39,14 @@ module Prelude.Vector where
              → Vec A k → Vec A m
   vec-reindx refl v = v
 
+  vec-reindx-elim
+    : {k m : ℕ}{A : Set}{P : {l : ℕ} → Vec A l → Set}
+    → (p : k ≡ m)(v : Vec A k)
+    → P (vec-reindx p v)
+    → P v
+  vec-reindx-elim refl v pv = pv
+    
+
   vec-toList : {k : ℕ}{A : Set}(v : Vec A k)
              → vec (toList v) (length-toList v) ≡ v
   vec-toList [] = refl
@@ -67,6 +75,11 @@ module Prelude.Vector where
        → Vec A k → Vec B k
   vmap f []       = []
   vmap f (x ∷ xs) = f x ∷ vmap f xs
+
+  vmapM : {k : ℕ}{A B : Set}(f : A → Maybe B)
+       → Vec A k → Maybe (Vec B k)
+  vmapM f []       = just []
+  vmapM f (x ∷ xs) = _∷_ <M> f x <M*> vmapM f xs
 
   vmap-vec : {k : ℕ}{A B : Set}(f : A → B)(l : List A)
              {p : length l ≡ k}{q : length (map f l) ≡ k}

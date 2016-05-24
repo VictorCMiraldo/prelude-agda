@@ -15,10 +15,30 @@ module Prelude.Monad where
 
   open Monad {{...}}
 
+  join : ∀{a}{M : Set a → Set a}{{m : Monad M}}{A : Set a}
+       → M (M A) → M A
+  join mma = mma >>= id
+
   mapM : ∀{a}{M : Set a → Set a}{{ m : Monad M}}{A B : Set a} 
        → (A → M B) → List A → M (List B)
   mapM f []       = return []
   mapM f (x ∷ la) = f x >>= (λ x' → mapM f la >>= return ∘ _∷_ x')
+
+  mapM-map-compose : ∀{a}{M : Set a → Set a}{{ m : Monad M}}{A B C : Set a} 
+                   → (fm : B → M C)(f : A → B)(l : List A)
+                   → mapM fm (map f l) ≡ mapM (fm ∘ f) l
+  mapM-map-compose fm f [] = refl
+  mapM-map-compose fm f (x ∷ l)
+    = cong (λ P → (fm (f x)) >>= P)
+      (fun-ext (λ k → cong (λ P → _>>=_ P (return ∘ _∷_ k)) (mapM-map-compose fm f l)))
+
+  zipWithM : ∀{a}{M : Set a → Set a}{{ m : Monad M}}{A B C : Set a} 
+           → (A → B → M C) → List A → List B → M (List C)
+  zipWithM f [] [] = return []
+  zipWithM f [] (x ∷ lb) = return []
+  zipWithM f (x ∷ la) [] = return []
+  zipWithM f (a ∷ la) (b ∷ lb)
+    = f a b >>= λ c → zipWithM f la lb >>= λ cs → return (c ∷ cs)
 
   _>>_ : ∀{a}{M : Set a → Set a}{{ m : Monad M }}{A B : Set a}
        → M A → M B → M B

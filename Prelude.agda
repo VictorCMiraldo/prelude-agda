@@ -54,7 +54,7 @@ module Prelude where
   open import Data.List
     using (List; _∷_; []; map; _++_; zip; filter;
            all; any; concat; foldr; reverse; length;
-           sum)
+           sum; zipWith)
     public
 
   open import Data.Product

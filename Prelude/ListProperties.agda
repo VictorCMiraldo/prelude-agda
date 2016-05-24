@@ -13,6 +13,7 @@ module Prelude.ListProperties where
 
   open import Data.List.All
     using (All; []; _∷_)
+    renaming (all to all?)
     public
 
   open import Data.List.Any
