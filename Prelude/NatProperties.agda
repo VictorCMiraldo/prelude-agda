@@ -46,6 +46,9 @@ module Prelude.NatProperties where
   ≤-abs : {n m : ℕ} → suc m ≤ n → m ≡ n → ⊥
   ≤-abs {m = zero} (s≤s p) ()
   ≤-abs {m = suc m} (s≤s p) q = ≤-abs p (suc-inj q)
+  
+  ≤-abs-0 : {m : ℕ} → suc m ≤ 0 → ⊥
+  ≤-abs-0 ()
 
   ≤-strict : {n m : ℕ}{p : ¬ (n ≡ m)} 
            → suc n ≤ m → (n ≟-ℕ m) ≡ no p
