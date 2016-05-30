@@ -150,6 +150,9 @@ module Prelude where
   lhead []      = nothing
   lhead (x ∷ _) = just x
 
+  cons : ∀{a}{A : Set a} → A × List A → List A
+  cons (a , as) = a ∷ as
+
   filter-just : {A : Set} → List (Maybe A) → List A
   filter-just [] = []
   filter-just (nothing ∷ as) = filter-just as
