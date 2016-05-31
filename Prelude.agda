@@ -68,7 +68,7 @@ module Prelude where
   _**_ : {A B : Set} → List A → List B → List (A × B)
   [] ** _ = []
   _ ** [] = []
-  (a ∷ as) ** bs = map (λ y → (a , y)) bs ++ (as ** bs)  
+  (a ∷ as) ** bs = map (λ y → (a , y)) bs ++ (as ** bs)
 
   open import Data.Sum
     using (_⊎_; [_,_]′)
@@ -114,41 +114,17 @@ module Prelude where
       fg-id : ∀ x → f (g x) ≡ x
       gf-id : ∀ x → g (f x) ≡ x
 
+  ×-inj : ∀{a b}{A : Set a}{B : Set b}{a1 a2 : A}{b1 b2 : B}
+        → (a1 , b1) ≡ (a2 , b2)
+        → a1 ≡ a2 × b1 ≡ b2
+  ×-inj refl = refl , refl
+
   {-# BUILTIN REWRITE _≡_ #-}
 
-  {- Usefull List Processing -}
-
-  lsplit : ∀{a}{A : Set a}(n : ℕ)(l : List A) → List A × List A
-  lsplit zero l          = [] , l
-  lsplit (suc n) []      = [] , []
-  lsplit (suc n) (x ∷ l) 
-    = let li , lo = lsplit n l
-       in x ∷ li , lo
-
-  lsplit-++-lemma
-    : ∀{a}{A : Set a}(l1 l2 : List A) 
-    → lsplit (length l1) (l1 ++ l2) ≡ (l1 , l2)
-  lsplit-++-lemma [] l2 = refl
-  lsplit-++-lemma (x ∷ l1) l2 
-    rewrite lsplit-++-lemma l1 l2 
-          = refl
-
-  lsplit-length-lemma
-    : ∀{a}{A : Set a}(l : List A)
-    → (m n : ℕ)
-    → m + n ≤ length l
-    → m ≤ length (p1 (lsplit m l))
-    × n ≤ length (p2 (lsplit m l))
-  lsplit-length-lemma l zero n hip = z≤n , hip
-  lsplit-length-lemma [] (suc m) n ()
-  lsplit-length-lemma (x ∷ l) (suc m) n (s≤s hip) 
-    = let r1 , r2 = lsplit-length-lemma l m n hip
-       in (s≤s r1) , r2
-    
-
   lhead : ∀{a}{A : Set a} → List A → Maybe A
-  lhead []      = nothing
-  lhead (x ∷ _) = just x
+  lhead []       = nothing
+  lhead (x ∷ []) = just x
+  lhead (_ ∷ _)  = nothing
 
   cons : ∀{a}{A : Set a} → A × List A → List A
   cons (a , as) = a ∷ as
@@ -158,12 +134,12 @@ module Prelude where
   filter-just (nothing ∷ as) = filter-just as
   filter-just (just a  ∷ as) = a ∷ filter-just as
 
-  map-lemma : {A B : Set}{f : A → B}{g : B → A}
-            → (l : List A)
-            → (∀ x → g (f x) ≡ x)
-            → map g (map f l) ≡ l
-  map-lemma [] prf      = refl
-  map-lemma (x ∷ l) prf = cong₂ _∷_ (prf x) (map-lemma l prf)
+  lsplit : ∀{a}{A : Set a}(n : ℕ)(l : List A) → List A × List A
+  lsplit zero l          = [] , l
+  lsplit (suc n) []      = [] , []
+  lsplit (suc n) (x ∷ l) 
+    = let li , lo = lsplit n l
+       in x ∷ li , lo
 
   {- Some Propositional Logic -}
   

@@ -23,6 +23,54 @@ module Prelude.ListProperties where
   open Membership-≡
     public
 
+  lsplit-++-lemma
+    : ∀{a}{A : Set a}(l1 l2 : List A) 
+    → lsplit (length l1) (l1 ++ l2) ≡ (l1 , l2)
+  lsplit-++-lemma [] l2 = refl
+  lsplit-++-lemma (x ∷ l1) l2 
+    rewrite lsplit-++-lemma l1 l2 
+          = refl
+
+  lsplit-elim
+    : ∀{a}{A : Set a}(k : ℕ)(l : List A){m n : List A}
+    → lsplit k l ≡ (m , n)
+    → l ≡ m ++ n
+  lsplit-elim zero l refl = refl
+  lsplit-elim (suc k) [] refl = refl
+  lsplit-elim (suc k) (x ∷ l) refl = cong (_∷_ x) (lsplit-elim k l refl)
+
+  length-lemma 
+    : {n : ℕ}{A : Set}(l1 l2 : List A)
+    → length l1 ≡ n → n ≤ length (l1 ++ l2)
+  length-lemma [] l2 refl = z≤n
+  length-lemma (x ∷ l1) l2 refl = s≤s (length-lemma l1 l2 refl)
+
+  lsplit-length-lemma
+    : ∀{a}{A : Set a}(l : List A)
+    → (m n : ℕ)
+    → m + n ≤ length l
+    → m ≤ length (p1 (lsplit m l))
+    × n ≤ length (p2 (lsplit m l))
+  lsplit-length-lemma l zero n hip = z≤n , hip
+  lsplit-length-lemma [] (suc m) n ()
+  lsplit-length-lemma (x ∷ l) (suc m) n (s≤s hip) 
+    = let r1 , r2 = lsplit-length-lemma l m n hip
+       in (s≤s r1) , r2
+
+  lhead-elim : ∀{a}{A : Set a}{x : A}(l : List A)
+             → lhead l ≡ just x
+             → l ≡ (x ∷ [])
+  lhead-elim [] ()
+  lhead-elim (x ∷ []) refl = refl
+  lhead-elim (x₁ ∷ x₂ ∷ l) ()
+
+  map-lemma : {A B : Set}{f : A → B}{g : B → A}
+            → (l : List A)
+            → (∀ x → g (f x) ≡ x)
+            → map g (map f l) ≡ l
+  map-lemma [] prf      = refl
+  map-lemma (x ∷ l) prf = cong₂ _∷_ (prf x) (map-lemma l prf)
+
   list-split-lemma 
     : {A : Set}{n : ℕ}{l : List A}
     → n ≤ length l
