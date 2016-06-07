@@ -145,6 +145,17 @@ module Prelude.ListProperties where
     rewrite concat-map-map {f = f} {g} l
       = sym (map-++-commute f (g x) (concat (map g l)))
 
+  map-inj-inj : {A B : Set}(f : A → B)(f-inj : ∀ x y → f x ≡ f y → x ≡ y)
+              → {l1 l2 : List A}
+              → map f l1 ≡ map f l2
+              → l1 ≡ l2
+  map-inj-inj f f-inj {[]} {[]} hip = refl
+  map-inj-inj f f-inj {[]} {x ∷ l2} ()
+  map-inj-inj f f-inj {x ∷ l1} {[]} ()
+  map-inj-inj f f-inj {x ∷ l1} {x₁ ∷ l2} hip
+    = cong₂ _∷_ (f-inj x x₁ (p1 (∷-inj hip)))
+                (map-inj-inj f f-inj {l1} {l2} (p2 (∷-inj hip)))
+
   non-empty : {A : Set}(l : List A)
             → ∃ (λ n → suc n ≡ length l)
             → A × List A
