@@ -231,6 +231,17 @@ module Prelude where
             → f <M> x ≡ just (f k)
   <M>-intro refl = refl
 
+  <M>-inj : ∀{a b}{A : Set a}{B : Set b}{f : A → B}
+          → (∀ {x y} → f x ≡ f y → x ≡ y)
+          → {m n : Maybe A}
+          → f <M> m ≡ f <M> n
+          → m ≡ n
+  <M>-inj f-inj {nothing} {nothing} hip = refl
+  <M>-inj f-inj {just m} {just n} hip
+    = cong just (f-inj (just-inj hip))
+  <M>-inj f-inj {just m} {nothing} ()
+  <M>-inj f-inj {nothing} {just n} ()
+
   _<M*>_ : ∀{a b}{A : Set a}{B : Set b} 
          → Maybe (A → B) → Maybe A → Maybe B
   _       <M*> nothing = nothing
