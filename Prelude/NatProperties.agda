@@ -92,6 +92,11 @@ module Prelude.NatProperties where
   ≤-trans z≤n s = z≤n
   ≤-trans (s≤s r) (s≤s s) = s≤s (≤-trans r s)
 
+  ≤-yes : {m n : ℕ}(prf : m ≤ n) → (m ≤?-ℕ n) ≡ yes prf
+  ≤-yes {m} {n} prf with m ≤?-ℕ n
+  ...| no  abs = ⊥-elim (abs prf)
+  ...| yes q   = cong yes (≤-pi q prf)
+
   1-≤-+-distr : (m n : ℕ) → 1 ≤ m + n → (1 ≤ m) ⊎ (1 ≤ n)
   1-≤-+-distr zero n hip    = i2 hip
   1-≤-+-distr (suc m) n hip = i1 (s≤s z≤n)

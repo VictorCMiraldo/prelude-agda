@@ -23,6 +23,10 @@ module Prelude.ListProperties where
   open Membership-≡
     public
 
+  ∷≡[]→⊥ : ∀{a}{A : Set a}{x : A}{xs : List A}
+         → _≡_ {A = List A} (x ∷ xs) [] → ⊥
+  ∷≡[]→⊥ ()
+
   lsplit-++-lemma
     : ∀{a}{A : Set a}(l1 l2 : List A) 
     → lsplit (length l1) (l1 ++ l2) ≡ (l1 , l2)
@@ -89,6 +93,11 @@ module Prelude.ListProperties where
         → l ≡ [] × j ≡ []
   ++-[] {l = []} prf = refl , prf
   ++-[] {l = x ∷ l} ()
+
+  ++-left-id : ∀{a}{A : Set a}(l : List A)
+             → l ++ [] ≡ l
+  ++-left-id []       = refl
+  ++-left-id (l ∷ ls) = cong (_∷_ l) (++-left-id ls)
 
   ++-length : ∀{a}{A : Set a}{l1 l2 : List A}{n1 n2 : ℕ}
             → length l1 ≡ n1
