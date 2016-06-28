@@ -6,7 +6,7 @@ module Prelude.ListProperties where
 
   open import Data.List.Properties
     using ( length-++; map-compose; map-++-commute
-          ; length-map
+          ; length-map; map-id
           )
     renaming (∷-injective to ∷-inj)
     public
@@ -49,17 +49,32 @@ module Prelude.ListProperties where
   length-lemma [] l2 refl = z≤n
   length-lemma (x ∷ l1) l2 refl = s≤s (length-lemma l1 l2 refl)
 
-  lsplit-length-lemma
+  lsplit-length-≤-lemma
     : ∀{a}{A : Set a}(l : List A)
     → (m n : ℕ)
     → m + n ≤ length l
     → m ≤ length (p1 (lsplit m l))
     × n ≤ length (p2 (lsplit m l))
-  lsplit-length-lemma l zero n hip = z≤n , hip
-  lsplit-length-lemma [] (suc m) n ()
-  lsplit-length-lemma (x ∷ l) (suc m) n (s≤s hip) 
-    = let r1 , r2 = lsplit-length-lemma l m n hip
+  lsplit-length-≤-lemma l zero n hip = z≤n , hip
+  lsplit-length-≤-lemma [] (suc m) n ()
+  lsplit-length-≤-lemma (x ∷ l) (suc m) n (s≤s hip) 
+    = let r1 , r2 = lsplit-length-≤-lemma l m n hip
        in (s≤s r1) , r2
+
+  lsplit-length-≡-lemma
+    : ∀{a}{A : Set a}(l : List A)
+    → (m n : ℕ)
+    → (hip : length l ≡ m + n)
+    → (length (p1 (lsplit m l)) ≡ m)
+    × (length (p2 (lsplit m l)) ≡ n)
+  lsplit-length-≡-lemma [] zero .0 refl 
+    = refl , refl
+  lsplit-length-≡-lemma [] (suc m) n ()
+  lsplit-length-≡-lemma (x ∷ l) zero n hip 
+    = refl , hip
+  lsplit-length-≡-lemma (x ∷ l) (suc m) n hip 
+    = let r1 , r2 = lsplit-length-≡-lemma l m n (suc-inj hip)
+       in cong suc r1 , r2
 
   lhead-elim : ∀{a}{A : Set a}{x : A}(l : List A)
              → lhead l ≡ just x

@@ -102,6 +102,12 @@ module Prelude.Vector where
   vmap-lemma [] prf      = refl
   vmap-lemma (x ∷ k) prf = cong₂ _∷_ (prf x) (vmap-lemma k prf)
 
+  vmap-id
+    : {k : ℕ}{A : Set}(v : Vec A k)
+    → vmap id v ≡ v
+  vmap-id []       = refl
+  vmap-id (x ∷ xs) = cong (_∷_ x) (vmap-id xs)
+
   vmap-compose
     : {k : ℕ}{A B C : Set}{f : B → C}{g : A → B}
     → (v : Vec A k)
