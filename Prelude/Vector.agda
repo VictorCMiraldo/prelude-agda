@@ -7,9 +7,19 @@ open import Prelude.NatProperties
 module Prelude.Vector where
 
   open import Data.Vec 
-    using (Vec; []; _∷_; head; tail) 
+    using (Vec; []; _∷_; head; tail; lookup; tabulate) 
     renaming (_++_ to _++v_)
     public
+
+  data VecI {a b}{A : Set a}(F : A → Set b) : {n : ℕ} → Vec A n → Set (a ⊔ b) where
+    []  : VecI F []
+    _∷_ : {n : ℕ}{K : A}{V : Vec A n}
+        → F K → VecI F V → VecI F (K ∷ V)
+
+  lookupᵢ : ∀{a b}{A : Set a}{F : A → Set b}{n : ℕ}{v : Vec A n}
+          → (i : Fin n) → VecI F v → F (lookup i v)
+  lookupᵢ fz (x ∷ vs) = x
+  lookupᵢ (fs i) (x ∷ vs) = lookupᵢ i vs
 
   vsum : {k : ℕ} → Vec ℕ k → ℕ
   vsum [] = 0
@@ -71,7 +81,7 @@ module Prelude.Vector where
         → l₁ ≡ l₂ → vec l₁ p ≡ vec l₂ q
   vec-≡ {l₁ = l} refl = vec-reduce l
 
-  vmap : {k : ℕ}{A B : Set}(f : A → B)
+  vmap : ∀{a}{k : ℕ}{A B : Set a}(f : A → B)
        → Vec A k → Vec B k
   vmap f []       = []
   vmap f (x ∷ xs) = f x ∷ vmap f xs

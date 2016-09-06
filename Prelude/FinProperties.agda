@@ -2,6 +2,9 @@ open import Prelude
 
 module Prelude.FinProperties where
 
+  fs-inj : {n : ℕ}{i j : Fin n} → fs i ≡ fs j → i ≡ j
+  fs-inj refl = refl
+
   Fink→A≈ListA : ∀{a}{A : Set a}{n : ℕ}
                → (Fin n → A) → List A
   Fink→A≈ListA {n = zero} f = []

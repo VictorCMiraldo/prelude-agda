@@ -119,6 +119,16 @@ module Prelude where
         → a1 ≡ a2 × b1 ≡ b2
   ×-inj refl = refl , refl
 
+  i1-inj : ∀{a b}{A : Set a}{B : Set b}{a1 a2 : A}
+         → i1 {B = B} a1 ≡ i1 a2
+         → a1 ≡ a2
+  i1-inj refl = refl
+
+  i2-inj : ∀{a b}{A : Set a}{B : Set b}{b1 b2 : B}
+         → i2 {A = A} b1 ≡ i2 b2
+         → b1 ≡ b2
+  i2-inj refl = refl
+
   {-# BUILTIN REWRITE _≡_ #-}
 
   lhead : ∀{a}{A : Set a} → List A → Maybe A
@@ -320,6 +330,18 @@ module Prelude where
   open Enum {{...}}
 
   instance
+    eq-Unit : Eq Unit
+    eq-Unit = eq (λ { unit unit → yes refl })
+
+    eq-Bool : Eq Bool
+    eq-Bool = eq decide
+      where 
+        decide : (x y : Bool) → Dec (x ≡ y)
+        decide true  true   = yes refl
+        decide true  false  = no (λ ())
+        decide false true  = no (λ ())
+        decide false false = yes refl
+
     eq-ℕ : Eq ℕ
     eq-ℕ = eq _≟-ℕ_
 
