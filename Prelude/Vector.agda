@@ -230,3 +230,9 @@ module Prelude.Vector where
             → vsum v ≡ sum (toList v)
   vsum-spec [] = refl
   vsum-spec (x ∷ v) = cong (_+_ x) (vsum-spec v)
+
+  vdrop : {k : ℕ}{A : Set}
+        → Vec A (suc k) → Fin (suc k) → Vec A k
+  vdrop (x ∷ v) fz = v
+  vdrop (x ∷ []) (fs ())
+  vdrop (x ∷ x₁ ∷ v) (fs f) = x ∷ vdrop (x₁ ∷ v) f
