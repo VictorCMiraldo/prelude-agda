@@ -26,6 +26,19 @@ module Prelude.NatProperties where
           | +-comm o m
           = +-inj-1 {m = m} p
 
+  +-exch : ∀ m n o p 
+         → (m + n) + (o + p) ≡ (m + o) + (n + p)
+  +-exch m n o p 
+    = trans (+-assoc m n (o + p)) 
+     (trans (cong (m +_) (sym (+-assoc n o p))) 
+     (trans (cong (λ Q → m + (Q + p)) (+-comm n o))
+     (trans (cong (m +_) (+-assoc o n p)) 
+            (sym (+-assoc m o (n + p))))))
+
+  ≤-refl : {m : ℕ} → m ≤ m
+  ≤-refl {zero} = z≤n
+  ≤-refl {suc n} = s≤s ≤-refl
+
   ≤-step : {n m : ℕ} → n ≤ m → n ≤ suc m
   ≤-step hip = ≤-steps 1 hip
 
