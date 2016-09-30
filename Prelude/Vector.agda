@@ -21,6 +21,23 @@ module Prelude.Vector where
   lookupᵢ fz (x ∷ vs) = x
   lookupᵢ (fs i) (x ∷ vs) = lookupᵢ i vs
 
+  ∷ᵥ-inj : {n : ℕ}{A : Set}{v u : A}{vs us : Vec A n}
+         → _≡_ {A = Vec A (suc n)}(v ∷ vs) (u ∷ us)
+         → v ≡ u × vs ≡ us
+  ∷ᵥ-inj refl = refl , refl
+
+  swap : {A : Set}{n : ℕ} → Fin n → Vec A n → A → Vec A n
+  swap () [] a
+  swap fz     (v ∷ vs) a = a ∷ vs
+  swap (fs i) (v ∷ vs) a = v ∷ (swap i vs a)
+
+  swap-uni
+    : {A : Set}{n : ℕ}(i : Fin n)(v : Vec A n)
+    → swap i v (lookup i v) ≡ v
+  swap-uni () []
+  swap-uni fz (x ∷ v) = refl
+  swap-uni (fs i) (x ∷ v) = cong (x ∷_) (swap-uni i v)
+
   vsum : {k : ℕ} → Vec ℕ k → ℕ
   vsum [] = 0
   vsum (x ∷ xs) = x + vsum xs
@@ -48,6 +65,12 @@ module Prelude.Vector where
   vec-reindx : {k m : ℕ}{A : Set}(p : k ≡ m)
              → Vec A k → Vec A m
   vec-reindx refl v = v
+
+  vec-reindx-uni
+    : {k m : ℕ}{A : Set}(p : k ≡ m)
+    → (v : Vec A m)
+    → vec-reindx p (vec-reindx (sym p) v) ≡ v
+  vec-reindx-uni refl v = refl
 
   vec-reindx-elim
     : {k m : ℕ}{A : Set}{P : {l : ℕ} → Vec A l → Set}

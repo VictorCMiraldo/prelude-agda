@@ -119,3 +119,7 @@ module Prelude.NatProperties where
   m≢n-elim zero (suc n) hip = n , i2 refl
   m≢n-elim (suc m) zero hip = m , i1 refl
   m≢n-elim (suc m) (suc n) hip = m , i1 refl
+
+  m≢0-elim : (m : ℕ) → (m ≡ 0 → ⊥) → ∃ (λ k → m ≡ suc k)
+  m≢0-elim zero hip = ⊥-elim (hip refl)
+  m≢0-elim (suc m) hip = m , refl
