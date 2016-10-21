@@ -258,8 +258,12 @@ module Prelude.Monad where
   NonDetRet : ∀{a}{A : Set a} → A → NonDet A
   NonDetRet x = x ∷ []
 
+  NonDetApp : ∀{a}{A B : Set a} → NonDet (A → B) → NonDet A → NonDet B
+  NonDetApp [] xs       = []
+  NonDetApp (x ∷ gs) xs = map x xs ++ NonDetApp gs xs
+
   instance
-    MonadNonDet : Monad {lz} NonDet
+    MonadNonDet : ∀{a} → Monad {a} NonDet
     MonadNonDet = record
       { return = NonDetRet
       ; _>>=_  = NonDetBind
@@ -293,3 +297,28 @@ module Prelude.Monad where
       { return = reader-return
       ; _>>=_  = reader-bind
       }
+
+  module Applicative where
+    
+    record IsApplicative {a}{M : Set a → Set a}
+            (m : Monad M) : Set (ls a) where
+      constructor app
+      infixl 20 _<*>_
+      field
+        _<*>_ : {A B : Set a} → M (A → B) → M A → M B      
+
+    open IsApplicative {{...}}
+
+    infixl 20 _<$>_
+    _<$>_ : ∀{a}{M : Set a → Set a}{{m : Monad M}}
+             {{app : IsApplicative m}}{A B : Set a}
+          → (A → B) → M A → M B
+    _<$>_ {{_}} {{app go}} f a = go (return f) a
+    
+
+    instance
+      maybe-app : ∀{a} → IsApplicative {a} MonadMaybe
+      maybe-app = record { _<*>_ = _<M*>_ }
+
+      list-app : ∀{a} → IsApplicative {a} MonadNonDet
+      list-app = app NonDetApp
