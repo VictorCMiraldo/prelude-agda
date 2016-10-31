@@ -195,6 +195,10 @@ module Prelude where
   ≡-Is-Just : ∀{a}{A : Set a}{x : Maybe A}{k : A} → x ≡ just k → Is-Just x
   ≡-Is-Just {k = k} refl = indeed k
 
+  Is-Just-magic : ∀{a}{A : Set a}
+                → Is-Just {A = A} nothing → ⊥
+  Is-Just-magic ()
+
   Is-Just-⊥ : ∀{a}{A : Set a}{x : A} 
             → (Is-Just (just x) → Is-Just {A = A} nothing) → ⊥
   Is-Just-⊥ {x = x} f with f (indeed x) 
@@ -364,6 +368,36 @@ module Prelude where
 
     enum-⊥ : Enum ⊥
     enum-⊥ = enum ⊥-elim (const nothing)
+
+    eq-pair : ∀{A B} ⦃ eqA : Eq A ⦄ ⦃ eqB : Eq B ⦄ → Eq (A × B)
+    eq-pair = eq decide
+      where
+        decide : {A B : Set}⦃ eqA : Eq A ⦄ ⦃ eqB : Eq B ⦄
+               → (x y : A × B) → Dec (x ≡ y)
+        decide {{eq cA}} {{eq cB}} (x1 , x2) (y1 , y2) 
+          with cA x1 y1
+        ...| no abs = no (abs ∘ p1 ∘ ×-inj)
+        ...| yes h
+          with cB x2 y2
+        ...| no abs = no (abs ∘ p2 ∘ ×-inj)
+        ...| yes i = yes (cong₂ _,_ h i)
+
+    eq-sum : ∀{A B} ⦃ eqA : Eq A ⦄ ⦃ eqB : Eq B ⦄ → Eq (A ⊎ B)
+    eq-sum = eq decide
+      where
+        decide : {A B : Set}⦃ eqA : Eq A ⦄ ⦃ eqB : Eq B ⦄
+               → (x y : A ⊎ B) → Dec (x ≡ y)
+        decide {{eq cA}} {{eq cB}} (i1 x) (i1 y)
+          with cA x y
+        ...| no abs = no (abs ∘ i1-inj)
+        ...| yes h  = yes (cong i1 h)
+        decide {{eq cA}} {{eq cB}} (i2 x) (i2 y)
+          with cB x y
+        ...| no abs = no (abs ∘ i2-inj)
+        ...| yes h  = yes (cong i2 h)
+        decide (i1 x) (i2 y) = no (λ ())
+        decide (i2 x) (i1 y) = no (λ ())
+          
 
     eq-Maybe : ∀{A} ⦃ eqA : Eq A ⦄ → Eq (Maybe A)
     eq-Maybe = eq decide

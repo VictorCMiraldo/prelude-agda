@@ -11,6 +11,11 @@ module Prelude.Vector where
     renaming (_++_ to _++v_)
     public
 
+  data All {a b}{A : Set a}(P : A → Set b) : {n : ℕ} → Vec A n → Set (a ⊔ b) where
+    []  : All P []
+    _∷_ : {n : ℕ}{k : A}{v : Vec A n}
+        → P k → All P v → All P (k ∷ v)
+
   data VecI {a b}{A : Set a}(F : A → Set b) : {n : ℕ} → Vec A n → Set (a ⊔ b) where
     []  : VecI F []
     _∷_ : {n : ℕ}{K : A}{V : Vec A n}
